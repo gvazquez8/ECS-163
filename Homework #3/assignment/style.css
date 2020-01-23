@@ -71,3 +71,16 @@ circle {
   stroke: steelblue;
   stroke-width: 2px;
 } */
+
+#mapTooltip {
+    white-space: pre-line;
+    position: absolute;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: black;
+    color: white;
+    overflow-x: visible;
+    overflow-y: visible;
+    display: block;
+    visibility: hidden;
+}

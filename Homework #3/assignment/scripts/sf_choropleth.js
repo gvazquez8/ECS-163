@@ -1,3 +1,5 @@
+const uniqueScheme = ["#fff7ec","#fee8c8","#fdd49e","#fdbb84","#fc8d59","#ef6548","#d7301f"]  
+
 // load data with queue
 var url1 = "./data/neighborhood.geojson";
 var url2 = "./data/listing_count.json";
@@ -10,7 +12,6 @@ var q = d3_queue.queue(1)
 
 function draw(error, data) {
   "use strict";
-
   // important: First argument it expects is error
   if (error) throw error;
 
@@ -23,7 +24,7 @@ function draw(error, data) {
 
   var color = d3.scaleThreshold()
     .domain([1, 25, 50, 100, 200, 300, 700])
-    .range(d3.schemeReds[7]);
+    .range(uniqueScheme);
 
   // create a projection properly scaled for SF
   var projection = d3.geoMercator()
@@ -35,14 +36,14 @@ function draw(error, data) {
   var path = d3.geoPath()
     .projection(projection);
 
-  // create and append the map of SF neighborhoods
+  // create and append the   of SF neighborhoods
   var map = d3.select('#map').selectAll('path')
     .data(data[0].features)
     .enter()
     .append('path')
     .attr('d', path)
     .style('stroke', 'black')
-    .style('stroke-width', 0.75);
+    .style('stroke-width', 1);
 
   // // normalize neighborhood names
   map.datum(function(d) {
@@ -63,6 +64,43 @@ function draw(error, data) {
     .attr("fill", function(d) {
       return color(d.count);
     })
-    .attr("transform", "translate(60" + ", 50" + ")");
+    .attr("transform", "translate(60" + ", 50" + ")")
+    .on("mouseover", (datum, index, nodes) => {
+      showTooltip(datum, index, nodes);
+    })
+    .on("mousemove", (datum, index, nodes) => {
+      moveTooltip(datum, index, nodes);
+    })
+    .on("mouseleave", (datum, index, nodes) => {
+      hideTooltip(datum, index, nodes);
+    })
 
+}
+
+
+function showTooltip(datum, index, nodes) {
+  // Initialize tooltip when user mouses over district on map
+
+  var tooltip = d3.select("#mapTooltip");
+
+  tooltip.style("left", d3.event.pageX + "px");
+  tooltip.style("top", d3.event.pageY + "px");
+  tooltip.style("visibility", "visible");
+  tooltip.text(datum.properties.neighbourhood + "\n" + datum.count);
+}
+
+function moveTooltip(datum, index, nodes) {
+  // Move tooltip as mouse moves while over district
+
+  var tooltip = d3.select("#mapTooltip");
+
+  tooltip.style("left", (d3.event.pageX )+ "px");
+  tooltip.style("top", (d3.event.pageY) + "px");
+}
+
+function hideTooltip(datum, index, nodes) {
+
+  var tooltip = d3.select("#mapTooltip");
+
+  tooltip.style("visibility", "hidden");
 }
