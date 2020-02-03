@@ -1,4 +1,4 @@
-// this is where your implementation for your scatter plot should go 
+// this is where your implementation for your scatter plot should go
 function ScatterPlot(svg, data, updateFlowDiagram) {
 
     var margins = {
@@ -9,7 +9,7 @@ function ScatterPlot(svg, data, updateFlowDiagram) {
     };
 
     this.svg = svg;
-    
+
     // grab the bounding box of the container
     var boundingBox = svg.node().getBoundingClientRect();
 
@@ -18,5 +18,7 @@ function ScatterPlot(svg, data, updateFlowDiagram) {
     var svgWidth = boundingBox.width;
 
     // this is where your code should go to generate the flow diagram from the random data
-    
+
+
+
 }
