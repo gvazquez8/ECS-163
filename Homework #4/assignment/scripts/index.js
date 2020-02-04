@@ -20,4 +20,5 @@ function tickDataFlow(newData) {
     // you'll probably want to implement these functions and call them :)
     //scatterPlot.draw(newData);
     flowDiagram.draw(newData);
+    scatterPlot.draw(newData);
 }

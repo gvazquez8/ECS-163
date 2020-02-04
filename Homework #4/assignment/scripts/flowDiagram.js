@@ -1,75 +1,58 @@
 // this is where your implementation for your flow diagram should go
 function FlowDiagram(svg, data) {
     this.svg = svg;
-    this.enter_y = 0;
-    this.update_y = 0;
-    this.exit_y = 0;
     // grab the bounding box of the container
     var boundingBox = svg.node().getBoundingClientRect();
 
     // grab the width and height of our containing SVG
     var svgHeight = boundingBox.height;
     var svgWidth = boundingBox.width;
+    var textDistance = 15;
 
-    function keyFunction(d) {
-        return d.id;
+    function keyFunction(data) {
+        return data.id;
     }
+
 
     // this is where your code should go to generate the flow diagram from the random data
-    selection = svg.selectAll("text")
-    	.data(data, keyFunction);
-
-
-    // Enter NEW data
-    selection.enter()
-    	.append("text")
-        .attr("fill", "green")
-        .attr("x", 0)
-    	.attr("y", () => {this.enter_y += 20; return this.enter_y;})
-    	.html((d) => {return d.name});
-
-    // //Update Data
-    selection.append("text")
-        .attr("fill", "orange")
-        .attr("x", svgWidth/3)
-        .attr("y", () => {this.update_y += 20; return this.update_y;})
-        .html((d) => {return d.name});
-
-    // //Remove unneeded data
-    selection.exit()
-        .append("text")
-        .attr("fill", "red")
-        .attr("x", 2*svgWidth/3)
-        .attr("y", () => {this.exit_y += 20; return this.exit_y;})
-        .html((d) => {return d.name});
-
-
+    var previousExitSelection = undefined;
     this.draw = function(newData) {
+    	this.enter_y = 0;
+    	this.update_y = 0;
+    	this.exit_y = 0;
+
+        // Remove Previous Exiting Data
+    	if (previousExitSelection !== undefined)
+    		previousExitSelection.remove();
+
         var selection = this.svg.selectAll("text")
-                            .data(newData);
+                            .data(newData, keyFunction);
+    	// Add New Data
+        selection.enter()
+                 .append("text")
+                 .attr("class", "enter")
+                 .attr("fill", "green")
+                 .attr("x", 0)
+                 .attr("y", () => {return (++this.enter_y) * textDistance;})
+                 .html((d) => {return d.name})
+                 .transition();
+
+        // Transition Data from Enter -> Update
         selection.transition()
                 .attr("fill", "orange")
+                .attr("class", "update")
                 .attr("x", svgWidth/3)
-                .attr("y", () => {
-                    this.enter_y -= 20;
-                    this.update_y += 20;
-                    return this.update_y;});
+                .attr("y", () => {return (++this.update_y)*textDistance;});
 
-        var entering = selection.enter()
-                                .append("text")
-                                .attr("fill", "green")
-                                .attr("x", 0)
-                                .attr("y", () => {this.enter_y += 20; return this.enter_y;})
-                                .html((d) => {return d.name});
-
-
-        selection.exit()
+        // Transition Data from Enter/Update -> Exit
+        selection.exit().transition()
                 .attr("fill", "red")
+                .attr("class", "exit")
                 .attr("x", 2*svgWidth/3)
-                .attr("y", () => {
-                    this.exit_y += 20;
-                    return this.exit_y;
-                })
-                .html((d) => {return d.name});
+                .attr("y", () => {return (++this.exit_y)*textDistance;});
+
+        previousExitSelection = selection.exit();
     }
+
+    this.draw(data)
 }
