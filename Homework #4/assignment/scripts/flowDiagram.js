@@ -13,7 +13,6 @@ function FlowDiagram(svg, data) {
         return data.id;
     }
 
-
     // this is where your code should go to generate the flow diagram from the random data
     var previousExitSelection = undefined;
     this.draw = function(newData) {
