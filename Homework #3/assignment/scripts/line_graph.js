@@ -19,10 +19,10 @@ var y = d3.scaleLinear().range([height, 0]);
 // define the line
 var valueline = d3.line()
   .x(function(d) {
-    return x(d.years);
+    return x(d[0]);
   })
   .y(function(d) {
-    return y(d.Chinatown);
+    return y(d[1]);
   });
 
 // append the svg obgect to the body of the page
@@ -39,9 +39,11 @@ d3.csv("./data/2010-2017_review.csv", function(error, data) {
   if (error) throw error;
   // format the data
   csv_data = data;
+  var line_data = []
   data.forEach(function(d) {
     d.year = parseTime(d.years);
     d.Chinatown = +d.Chinatown;
+    line_data.push([d.years, d.Chinatown])
   });
 
   // Scale the range of the data
@@ -53,7 +55,7 @@ d3.csv("./data/2010-2017_review.csv", function(error, data) {
   })]).nice();
   // Add the valueline path.
   svg.append("path")
-    .data([data])
+    .data([line_data])
     .attr("class", "line2")
     .attr("d", valueline)
     .attr("transform", "translate(52" + ", 70" + ")")
@@ -61,10 +63,33 @@ d3.csv("./data/2010-2017_review.csv", function(error, data) {
   svg.selectAll("dot")
     .data(csv_data)
     .enter().append("circle")
+    .attr("class", "dataPoint")
     .attr("r", 5)
     .attr("cx", (d) => {return x(d.years)})
     .attr("cy", (d) => {return y(d.Chinatown)})
-    .attr("transform", "translate(52,70)");
+    .attr("transform", "translate(52,70)")
+    .style("opacity", "0")
+    .on("mouseover", (d,i,n) => {
+      d3.select(n[i]).style("opacity", "1");
+      var dataText = d3.selectAll(".dataText").nodes()[i];
+      d3.select(dataText).style("opacity", "1");
+    })
+    .on("mouseleave", (d,i,n) => {
+      d3.select(n[i]).style("opacity", "0");
+      var dataText = d3.selectAll(".dataText").nodes()[i];
+      d3.select(dataText).style("opacity", "0");
+    });
+
+  svg.selectAll("dot")
+    .data(csv_data)
+    .enter().append("text")
+    .attr("class", "dataText")
+    .attr("x", (d) => {return x(d.years)})
+    .attr("y", (d) => {return y(d.Chinatown)})
+    .attr("transform", "translate(57,60)")
+    .style("opacity", "0")  
+    .html((d) => {return d.Chinatown});
+
 
   // Add the X Axis
   var marginB = 460;
@@ -113,11 +138,13 @@ d3.csv("./data/2010-2017_review.csv", function(error, data) {
 function updateGraph(district) {
   // format the data
 
+  var line_data = [];
   csv_data.forEach(function(d) {
     d.year = parseTime(d.years);
     d[district] = +d[district];
-  });
 
+    line_data.push([d.years, d[district]]);
+  });
   // Scale the range of the data
   x.domain(d3.extent(csv_data, function(d) {
     return d.years;
@@ -128,7 +155,8 @@ function updateGraph(district) {
 
   // Add the valueline path.
   svg.select(".line2")
-    .attr("d", valueline(csv_data))
+    .data([line_data])
+    .attr("d", valueline)
     .attr("transform", "translate(52" + ", 70" + ")");
 
   // Add the Y Axis
@@ -137,9 +165,14 @@ function updateGraph(district) {
     .call(d3.axisLeft(y)
       .ticks(5));
 
-  svg.selectAll("circle")
+  svg.selectAll(".dataPoint")
     .attr("cx", (d) => {return x(d.years)})
     .attr("cy", (d) => {return y(d[district])});
+
+  svg.selectAll(".dataText")
+    .attr("x", (d) => {return x(d.years)})
+    .attr("y", (d) => {return y(d[district])})
+    .html((d) => {return d[district]});
 
   svg.select(".graphTitle")
     .text(district.replace(/_/g, " "));
