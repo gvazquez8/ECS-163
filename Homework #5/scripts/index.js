@@ -1,5 +1,5 @@
 function initVisuals(data) {
-    console.log("Called index");
+    VISUAL_ONE = new VisualOne(d3.select("#visual1"), data);
 }
 
 function updateVisuals(data) {
