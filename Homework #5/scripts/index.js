@@ -1,9 +1,7 @@
 function initVisuals(data) {
-	// TODO - Implement visuals
-	console.log("Called index");
-	var worldMap = new WorldMap(d3.select(".worldMap"), data);
+    console.log("Called index");
 }
 
 function updateVisuals(data) {
-	// TODO - Update visuals
+    // TODO - Update visuals
 }
