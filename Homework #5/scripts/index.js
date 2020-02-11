@@ -1,5 +1,5 @@
 function initVisuals(data) {
-    VISUAL_ONE = new VisualOne(d3.select("#visual1"), data);
+    VISUAL_ONE = new ScatterPlot(d3.select("#scatterPlot"), data);
 }
 
 function updateVisuals(data) {
