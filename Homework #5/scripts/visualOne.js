@@ -64,4 +64,16 @@ function VisualOne(svg, data) {
     }
 
     this.draw("Population", "Deathrate");
+
+
+    var dropDown = d3.select("#xAxisSelection");
+
+    dropDown.selectAll("option")
+        .data(this.data["columns"].filter((d) => {
+            return d === "Country" || d === "Region" ? false : true;
+        }))
+        .enter()
+        .append("option")
+        .attr("value", (d) => { return d; })
+        .html((d) => { return d; })
 }
