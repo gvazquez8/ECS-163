@@ -48,5 +48,11 @@ d3.csv("./data/countries_processed.csv", function(error, countries) {
         d.Population = +d.Population;
         d.Service = +d.Service;
     });
+
+    countries = countries.filter((d) => {
+        return (d.Region === "EASTERN EUROPE" || d.Region ===
+            "WESTERN EUROPE" ||
+            d.Region === "NORTHERN AMERICA") ? true : false;
+    })
     initVisuals(countries);
 });

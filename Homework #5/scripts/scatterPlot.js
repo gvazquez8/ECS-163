@@ -11,7 +11,7 @@ function ScatterPlot(svg, data) {
     this.data = data;
     this.svg = svg;
     this.svg.attr("height", 600);
-    this.selectRegion = [];
+    selectRegion = [];
     var boundingBox = this.svg.node().getBoundingClientRect();
     const svgHeight = boundingBox.height;
     const svgWidth = boundingBox.width;
@@ -82,7 +82,33 @@ function ScatterPlot(svg, data) {
         .attr("r", 5)
         .style("fill", (d) => { return color(d) })
         .attr("stroke", "black")
-        .attr("stroke-width", "1px");
+        .attr("stroke-width", "1px")
+        .on("click", (d) => {
+            if (selectRegion.includes(d)) {
+                selectRegion.splice(selectRegion.indexOf(
+                        d),
+                    selectRegion.indexOf(d) + 1
+                );
+            } else {
+                selectRegion.push(d);
+            }
+
+            svg.selectAll("circle").attr("opacity", (d) => {
+                return (selectRegion.includes(d.Region) ||
+                        selectRegion.length === 0) ===
+                    true ?
+                    1 :
+                    0.2;
+            })
+
+            svg.select(".legend")
+                .selectAll("circle")
+                .attr("opacity", (d) => {
+                    return ((selectRegion.includes(d) === true) ||
+                            selectRegion.length === 0) ?
+                        1 : 0.2;
+                })
+        });
 
     d3.select(".legend").selectAll("text")
         .data(colorDomain)
@@ -90,7 +116,33 @@ function ScatterPlot(svg, data) {
         .append("text")
         .attr("x", 20)
         .attr("y", (d, i) => { return 19.5 * (i + 2) })
-        .html((d) => { return d + "<br>"; });
+        .html((d) => { return d + "<br>"; })
+        .on("click", (d) => {
+            if (selectRegion.includes(d)) {
+                selectRegion.splice(selectRegion.indexOf(
+                        d),
+                    selectRegion.indexOf(d) + 1
+                );
+            } else {
+                selectRegion.push(d);
+            }
+
+            svg.selectAll("circle").attr("opacity", (d) => {
+                return (selectRegion.includes(d.Region) ||
+                        selectRegion.length === 0) ===
+                    true ?
+                    1 :
+                    0.2;
+            })
+
+            svg.select(".legend")
+                .selectAll("circle")
+                .attr("opacity", (d) => {
+                    return ((selectRegion.includes(d) === true) ||
+                            selectRegion.length === 0) ?
+                        1 : 0.2;
+                })
+        });
 
     d3.select(".legend")
         .append("text")
@@ -169,7 +221,6 @@ function ScatterPlot(svg, data) {
                     var tooltip = d3.select("#tooltip");
                     tooltip.style("visibility", "hidden");
                 });
-
         }
 
         dataPoints.enter()
@@ -197,6 +248,14 @@ function ScatterPlot(svg, data) {
                         1 :
                         0.2;
                 })
+
+                svg.select(".legend")
+                    .selectAll("circle")
+                    .attr("opacity", (d) => {
+                        return ((selectRegion.includes(d) === true) ||
+                                selectRegion.length === 0) ?
+                            1 : 0.2;
+                    })
             })
             .on("mouseover", (d) => {
                 if (selectRegion.includes(d.Region) || selectRegion
@@ -214,10 +273,12 @@ function ScatterPlot(svg, data) {
             .on("mouseleave", (d) => {
                 var tooltip = d3.select("#tooltip");
                 tooltip.style("visibility", "hidden");
-            })
+            });
+
+        dataPoints.enter().transition().duration(3000);
 
         update(dataPoints);
     }
 
-    this.draw("Population", "GDP ($ per capita)");
+    this.draw("GDP ($ per capita)", "Deathrate");
 }
