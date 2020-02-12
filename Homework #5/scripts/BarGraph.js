@@ -8,15 +8,13 @@ function BarGraph(svg, data) {
         left: 30,
         right: 50
     };
-    this.data = data;
     this.svg = svg;
     this.svg.attr("height", 600);
-    selectRegion = [];
     var boundingBox = this.svg.node().getBoundingClientRect();
     const svgHeight = boundingBox.height;
     const svgWidth = boundingBox.width;
     var colorDomain = []
-    this.data.forEach((d) => {
+    data.forEach((d) => {
         if (!colorDomain.includes(d.Region)) {
             colorDomain.push(d.Region);
         }
@@ -58,15 +56,15 @@ function BarGraph(svg, data) {
         .style("font-weight", "bold");
 
 
-    this.draw = function(y_data) {
+    this.draw = function(y_data, barData) {
 
-        this.data = this.data.filter((d) => {
+        barData = barData.filter((d) => {
             return (d[y_data] <= 0) ? false :
                 true
         });
 
-        x.domain(this.data.map((d) => { return d.Country }));
-        y.domain(d3.extent(this.data, (d) => { return d[y_data] }));
+        x.domain(barData.map((d) => { return d.Country }));
+        y.domain(d3.extent(barData, (d) => { return d[y_data] }));
 
         xAxisLabel.html("Countries");
         yAxisLabel.html(y_data);
@@ -92,9 +90,8 @@ function BarGraph(svg, data) {
             .call(d3.axisLeft(y));
 
         barContainer.selectAll("rect")
-            .data(this.data)
+            .data(barData)
             .enter().append("rect")
-            .attr("class", (d) => { return d.Country })
             .attr("x", function(d) { return x(d.Country); })
             .attr("width", x.bandwidth())
             .attr("y", function(d) {
@@ -105,6 +102,16 @@ function BarGraph(svg, data) {
             })
             .style("fill", (d) => { return color(d.Region) });
 
+        barContainer.selectAll("rect")
+            .data(barData)
+            .attr("x", function(d) { return x(d.Country) })
+            .attr("y", function(d) {
+                return (y(0));
+            })
+            .attr("height", function(d) {
+                return svgHeight - y(0);
+            })
+            .style("fill", (d) => { return color(d.Region) });
 
         barContainer.selectAll("rect")
             .transition()
@@ -115,8 +122,6 @@ function BarGraph(svg, data) {
             .attr("height", function(d) {
                 return svgHeight - y(d[y_data] - 1.5 * margins.bottom);
             })
-
-        function update(selection) {}
     }
-    this.draw("Phones (per 1000)");
+    this.draw("Phones (per 1000)", data);
 }

@@ -11,7 +11,6 @@ function ScatterPlot(svg, data) {
     this.data = data;
     this.svg = svg;
     this.svg.attr("height", 600);
-    selectRegion = [];
     var boundingBox = this.svg.node().getBoundingClientRect();
     const svgHeight = boundingBox.height;
     const svgWidth = boundingBox.width;
@@ -140,6 +139,14 @@ function ScatterPlot(svg, data) {
                             selectRegion.length === 0) ?
                         1 : 0.2;
                 })
+
+            updateBarGraph(this.data.filter((d) => {
+                return (selectRegion.includes(d.Region) ||
+                        selectRegion.length === 0) ===
+                    true ?
+                    true :
+                    false;
+            }))
         });
 
     d3.select(".legend")
