@@ -25,12 +25,12 @@ function BarGraph(svg, data) {
         .range([0, svgWidth - margins.right - 100])
         .padding(0.1);
     var y = d3.scaleLinear()
-        .range([svgHeight - margins.bottom, margins.top]);
+        .range([svgHeight - margins.bottom - 30, margins.top + 20]);
 
     var barContainer = svg.append("g")
         .attr("class", "barContainer")
         .attr("transform",
-            `translate(${1.8*margins.left}, ${-margins.bottom})`);
+            `translate(${1.8*margins.left}, ${-1.4*margins.bottom})`);
 
     var xAxisLabel = svg.append("text")
         .attr("id", "xAxisLabel")
@@ -71,7 +71,7 @@ function BarGraph(svg, data) {
         title.html(`${y_data} per Country`);
         svg.append("g")
             .attr("transform",
-                `translate(${1.8*margins.left},${svgHeight-1*margins.bottom})`
+                `translate(${1.8*margins.left},${svgHeight-1.6*margins.bottom})`
             )
             .call(d3.axisBottom(x))
             .selectAll("text")
@@ -79,7 +79,7 @@ function BarGraph(svg, data) {
             .attr("x", 8)
             .attr("dy", "0.35em")
             .attr("transform", "rotate(45)")
-            .style("font-size", "7px")
+            .style("font-size", "9px")
             .style("text-anchor", "start");
 
 
@@ -92,6 +92,10 @@ function BarGraph(svg, data) {
         barContainer.selectAll("rect")
             .data(barData)
             .enter().append("rect")
+            .attr("class", (d) => {
+                var className = d.Country.split('&').join('_');
+                return className.split(' ').join('_')
+            })
             .attr("x", function(d) { return x(d.Country); })
             .attr("width", x.bandwidth())
             .attr("y", function(d) {
@@ -100,7 +104,38 @@ function BarGraph(svg, data) {
             .attr("height", function(d) {
                 return svgHeight - y(0);
             })
-            .style("fill", (d) => { return color(d.Region) });
+            .style("fill", (d) => { return color(d.Region) })
+            .on("mouseover", (d) => {
+                var className = d.Country.split(' ').join('_');
+                className = className.split('&').join('_')
+                d3.select("#scatterPlot")
+                    .select(".points")
+                    .select(`.${className}`)
+                    .style("fill", "gold");
+                var tooltip = d3.select("#tooltip");
+                tooltip.style("left", d3.event.pageX + "px");
+                tooltip.style("top", d3.event.pageY + "px");
+                tooltip.style("visibility", "visible");
+                tooltip.style("text-align", "center");
+                tooltip.html(
+                    `<b>${d.Country}</b>: ${d[y_data]}`
+                );
+            })
+            .on("mouseleave", (d) => {
+                var className = d.Country.split(' ').join('_');
+                className = className.split('&').join('_')
+                d3.select("#scatterPlot")
+                    .select(".points")
+                    .select(`.${className}`)
+                    .style("fill", color(d.Country));
+                var tooltip = d3.select("#tooltip");
+                tooltip.style("visibility", "hidden");
+            })
+            .on("mousemove", (d) => {
+                var tooltip = d3.select("#mapTooltip");
+                tooltip.style("left", (d3.event.pageX) + "px");
+                tooltip.style("top", (d3.event.pageY) + "px");
+            })
 
         barContainer.selectAll("rect")
             .data(barData)
@@ -114,13 +149,18 @@ function BarGraph(svg, data) {
             .style("fill", (d) => { return color(d.Region) });
 
         barContainer.selectAll("rect")
+            .data(barData)
+            .exit()
+            .remove();
+
+        barContainer.selectAll("rect")
             .transition()
             .duration(800)
             .attr("y", function(d) {
-                return (y(d[y_data]) + margins.bottom - 10);
+                return (y(d[y_data]) + margins.bottom - 13);
             })
             .attr("height", function(d) {
-                return svgHeight - y(d[y_data] - 1.5 * margins.bottom);
+                return svgHeight - y(d[y_data] - 2 * margins.bottom);
             })
     }
     this.draw("Phones (per 1000)", data);

@@ -79,33 +79,7 @@ function ScatterPlot(svg, data) {
         .attr("r", 5)
         .style("fill", (d) => { return color(d) })
         .attr("stroke", "black")
-        .attr("stroke-width", "1px")
-        .on("click", (d) => {
-            if (selectRegion.includes(d)) {
-                selectRegion.splice(selectRegion.indexOf(
-                        d),
-                    selectRegion.indexOf(d) + 1
-                );
-            } else {
-                selectRegion.push(d);
-            }
-
-            svg.selectAll("circle").attr("opacity", (d) => {
-                return (selectRegion.includes(d.Region) ||
-                        selectRegion.length === 0) ===
-                    true ?
-                    1 :
-                    0.2;
-            })
-
-            svg.select(".legend")
-                .selectAll("circle")
-                .attr("opacity", (d) => {
-                    return ((selectRegion.includes(d) === true) ||
-                            selectRegion.length === 0) ?
-                        1 : 0.2;
-                })
-        });
+        .attr("stroke-width", "1px");
 
     d3.select(".legend").selectAll("text")
         .data(colorDomain)
@@ -113,41 +87,7 @@ function ScatterPlot(svg, data) {
         .append("text")
         .attr("x", 20)
         .attr("y", (d, i) => { return 19.5 * (i + 2) })
-        .html((d) => { return d + "<br>"; })
-        .on("click", (d) => {
-            if (selectRegion.includes(d)) {
-                selectRegion.splice(selectRegion.indexOf(
-                        d),
-                    selectRegion.indexOf(d) + 1
-                );
-            } else {
-                selectRegion.push(d);
-            }
-
-            svg.selectAll("circle").attr("opacity", (d) => {
-                return (selectRegion.includes(d.Region) ||
-                        selectRegion.length === 0) ===
-                    true ?
-                    1 :
-                    0.2;
-            })
-
-            svg.select(".legend")
-                .selectAll("circle")
-                .attr("opacity", (d) => {
-                    return ((selectRegion.includes(d) === true) ||
-                            selectRegion.length === 0) ?
-                        1 : 0.2;
-                })
-
-            updateBarGraph(this.data.filter((d) => {
-                return (selectRegion.includes(d.Region) ||
-                        selectRegion.length === 0) ===
-                    true ?
-                    true :
-                    false;
-            }))
-        });
+        .html((d) => { return d + "<br>"; });
 
     d3.select(".legend")
         .append("text")
@@ -192,24 +132,6 @@ function ScatterPlot(svg, data) {
                 .attr("cy", (d) => { return y(d[y_data]) })
                 .attr("r", 5)
                 .style("fill", (d) => { return color(d.Region) })
-                .on("click", (d) => {
-                    if (selectRegion.includes(d.Region)) {
-                        selectRegion.splice(selectRegion.indexOf(
-                                d.Region),
-                            selectRegion.indexOf(d.Region) +
-                            1
-                        );
-                    } else {
-                        selectRegion.push(d.Region);
-                    }
-
-                    svg.selectAll("circle").attr("opacity", (d) => {
-                        return selectRegion.includes(d.Region) ===
-                            true ?
-                            1 :
-                            0.1;
-                    })
-                })
                 .on("mouseover", (d) => {
                     if (selectRegion.includes(d.Region)) {
                         var tooltip = d3.select("#tooltip");
@@ -232,39 +154,16 @@ function ScatterPlot(svg, data) {
 
         dataPoints.enter()
             .append("circle")
+            .attr("class", (d) => {
+                var className = d.Country.split('&').join('_');
+                return className.split(' ').join('_')
+            })
             .attr("cx", (d) => {
                 return x(d[x_data]) + margins.left
             })
             .attr("cy", (d) => { return y(d[y_data]) })
             .attr("r", 5)
             .style("fill", (d) => { return color(d.Region) })
-            .on("click", (d) => {
-                if (selectRegion.includes(d.Region)) {
-                    selectRegion.splice(selectRegion.indexOf(
-                            d.Region),
-                        selectRegion.indexOf(d.Region) + 1
-                    );
-                } else {
-                    selectRegion.push(d.Region);
-                }
-
-                svg.selectAll("circle").attr("opacity", (d) => {
-                    return (selectRegion.includes(d.Region) ||
-                            selectRegion.length === 0) ===
-                        true ?
-                        1 :
-                        0.2;
-                })
-
-                svg.select(".legend")
-                    .selectAll("circle")
-                    .attr("opacity", (d) => {
-                        return ((selectRegion.includes(d) ===
-                                    true) ||
-                                selectRegion.length === 0) ?
-                            1 : 0.2;
-                    })
-            })
             .on("mouseover", (d) => {
                 if (selectRegion.includes(d.Region) || selectRegion
                     .length === 0) {
@@ -277,10 +176,23 @@ function ScatterPlot(svg, data) {
                         `<b>${d.Country}</b>\n${x_data}: ${d[x_data]}\n${y_data}: ${d[y_data]}`
                     );
                 }
+
+                var className = d.Country.split(' ').join('_');
+                className = className.split('&').join('_')
+                d3.select("#barGraph")
+                    .select(".barContainer")
+                    .select(`.${className}`)
+                    .style("fill", "gold");
             })
             .on("mouseleave", (d) => {
                 var tooltip = d3.select("#tooltip");
                 tooltip.style("visibility", "hidden");
+                var className = d.Country.split(' ').join('_');
+                className = className.split('&').join('_')
+                d3.select("#barGraph")
+                    .select(".barContainer")
+                    .select(`.${className}`)
+                    .style("fill", color(d.Country));
             });
 
         update(dataPoints);
