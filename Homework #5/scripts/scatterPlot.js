@@ -98,11 +98,6 @@ function ScatterPlot(svg, data) {
 
     this.draw = function(x_data, y_data) {
 
-        this.data = this.data.filter((d) => {
-            return (d[x_data] <= 0 || d[y_data] <= 0) ? false :
-                true
-        });
-
         x.domain(d3.extent(this.data, (d) => { return d[x_data] }));
         y.domain(d3.extent(this.data, (d) => { return d[y_data] }));
 
@@ -183,6 +178,10 @@ function ScatterPlot(svg, data) {
                     .select(".barContainer")
                     .select(`.${className}`)
                     .style("fill", "gold");
+
+                svg.select(".points")
+                    .select(`.${className}`)
+                    .style("fill", "gold");
             })
             .on("mouseleave", (d) => {
                 var tooltip = d3.select("#tooltip");
@@ -192,7 +191,11 @@ function ScatterPlot(svg, data) {
                 d3.select("#barGraph")
                     .select(".barContainer")
                     .select(`.${className}`)
-                    .style("fill", color(d.Country));
+                    .style("fill", color(d.Region));
+
+                svg.select(".points")
+                    .select(`.${className}`)
+                    .style("fill", color(d.Region));
             });
 
         update(dataPoints);

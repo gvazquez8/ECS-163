@@ -108,10 +108,17 @@ function BarGraph(svg, data) {
             .on("mouseover", (d) => {
                 var className = d.Country.split(' ').join('_');
                 className = className.split('&').join('_')
+
                 d3.select("#scatterPlot")
                     .select(".points")
                     .select(`.${className}`)
+                    .attr("r", 6)
                     .style("fill", "gold");
+
+                svg.select(".barContainer")
+                    .select(`.${className}`)
+                    .style("fill", "gold");
+
                 var tooltip = d3.select("#tooltip");
                 tooltip.style("left", d3.event.pageX + "px");
                 tooltip.style("top", d3.event.pageY + "px");
@@ -127,7 +134,13 @@ function BarGraph(svg, data) {
                 d3.select("#scatterPlot")
                     .select(".points")
                     .select(`.${className}`)
-                    .style("fill", color(d.Country));
+                    .attr("r", 5)
+                    .style("fill", color(d.Region));
+
+                svg.select(".barContainer")
+                    .select(`.${className}`)
+                    .style("fill", color(d.Region));
+
                 var tooltip = d3.select("#tooltip");
                 tooltip.style("visibility", "hidden");
             })
